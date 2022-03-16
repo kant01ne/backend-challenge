@@ -15,7 +15,6 @@ We're super happy to hear that! Getting right to it — the main purpose of this
 - Understand specs requirements.
 - Manipulate Data structure.
 - Create a small API in Node.js.
-- Create a DB schema.
 
 Feel free to open an issue if you got any questions or suggestions! Once it's ready, send us a repository link at louis@tryriot.com.
 
@@ -27,101 +26,103 @@ Louis, CTO @ Riot
 
 - [Riot Backend-challenge](#riot-backend-challenge)
   - [Table of Contents](#table-of-contents)
-    - [Exercise 1 : Sum Metric Service](#exercise-1--sum-metric-service)
+    - [Exercise 1 : Counters & Metrics Service](#exercise-1--counters--metrics-service)
       - [Problem](#problem)
       - [API](#api)
+        - [Counters](#counters)
         - [Metrics](#metrics)
       - [Clarifications](#clarifications)
-      - [Example](#example)
-    - [Exercise 2 : Database Schema](#exercise-2--database-schema)
+      - [GraphQL schema](#graphql-schema)
     - [Exercise 3 : 30 minutes technical interview and debriefing](#exercise-3--30-minutes-technical-interview-and-debriefing)
 
-### Exercise 1 : Sum Metric Service
+### Exercise 1 : Counters & Metrics Service
 
 #### Problem
 
-Build a metric logging and reporting service that sums metrics by time window for the most recent hour. You will build a lightweight web server that implements the two main APIs defined below.
+Build a counters & metrisc logging and reporting service that sums metrics. You will build a lightweight web server that implements the API defined below.
 
 #### API
 
+##### Counters
+
+**Increment counter Mutation**
+
+Increment the counter with the provided value for the given key and return the counter.
+
+**Counters Query**
+
+Returns all the counters ordered by the highest value.
+
+**Counter Query**
+
+Return the counter for a given key, if not provided return the counter with highest value. if no counter is found, return `null`.
+
 ##### Metrics
 
-**POST metrics**
+**Record metric Mutation**
 
-Request
+Record the metric with the provided value for the given key and return the metric.
 
-```curl
-POST /metrics/{key}
-{
-  "value": 30
-}
-```
+**Metrics Query**
 
-Response (200)
-{}
+Returns all the metrics ordered by the highest sum.
 
-**GET metrics sum**
+**Metric Query**
 
-Returns the sum of all metrics reported for this key over the past hour.
-
-Request
-
-```curl
-GET /metrics/{key}/sum
-```
-
-Response (200)
-
-```curl
-{
-  "value": 400
-}
-```
+Return the metric for a given key. if no metric is found, return `null`.
 
 #### Clarifications
 
 - For the sake of the problem, persistence is not required. Therefore don't use a database but just use in-memory data structures or file storage only.
-- Unless you have a strong preference otherwise, just use a simple webserver like Express.
+- Unless you have a strong preference otherwise, just use a the boilerplate given in the repository.
 - You should optimize for both readability of your code and performance.
 - All values will be rounded to the nearest integer.
-- You can get rid of any reported data after it is more than an hour old since we only need up to the most recent hour.
 
-#### Example
+#### GraphQL schema
 
-Imagine these are the events logged to your service for a metric "active_visitors" -
+```gql
+input IncrementInput {
+  key: String!
+  value: Int!
+}
 
-```curl
+type IncrementPayload {
+  counter: Counter!
+}
 
-// 2 hours ago **
-POST ​/metrics/​active_visitors { ​"value"​ = ​4​ }
+input RecordInput {
+  key: String!
+  value: Int!
+}
 
-// 30 minutes ago
-POST ​/metrics/​active_visitors { ​"value"​ = ​3​ }
+type RecordPayload {
+  metric: Metric!
+}
 
-// 40 seconds ago
-POST ​/metrics/​active_visitors { ​"value"​ = ​7​ }
+type Counter {
+  key: String!
+  value: Int!
+}
 
-// 5 seconds ago
-POST ​/metrics/​active_visitors { ​"value"​ = ​2​ }
+type Metric {
+  key: String!
+  value: Int!
+  sum: Int!
+}
 
+type Query {
+  counters: [Counter!]!
+  counter(key: String): Counter
+  metrics: [Metric!]!
+  metric(key: String!): Metric
+}
+
+type Mutation {
+  increment(input: IncrementInput!): IncrementPayload
+  record(input: RecordInput!): RecordPayload
+}
 ```
-
-These are the results expected from calling get aggregates:
-
-```curl
-
-GET ​/metrics/​active_visitors​/sum // returns 12
-
-```
-
-** Note that the metric posted 2 hours ago is not included in the sum since we only care about data in the most recent hour for these APIs.
-
-### Exercise 2 : Database Schema
-
-![1password screenshot](./img/1-password.png)
-
-According to the screenshot above, create your version of a SQL database schema with <https://drawsql.app/> (don't forget to include a public link to your github repository)
 
 ### Exercise 3 : 30 minutes technical interview and debriefing
 
-Once finished, send me your repository link by email: louis@tryriot.com & book a call [HERE](https://calendly.com/louis-cibot/code)
+Once finished, send me your repository link by email: louis@tryriot.com & book a call [HERE](http://calendly.com/louis-cibot/30min)
