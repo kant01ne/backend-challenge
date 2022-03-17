@@ -39,7 +39,9 @@ Louis, CTO @ Riot
 
 #### Problem
 
-Build a counters & metrics logging and reporting service that sums metrics. You will build a lightweight web server that implements the API defined below.
+Build a counter logging and reporting service which will allow you to increment various counters and retrieve their current values.
+Build a metrics logging and reporting service which will allow you to retrieve and sum the metrics' values by time window for the most recent hour.
+You will build a lightweight web server that implements the API defined below.
 
 #### API
 
@@ -73,10 +75,127 @@ Return the metric for a given key. if no metric is found, return `null`.
 
 #### Clarifications
 
-- For the sake of the problem, persistence is not required. Therefore don't use a database but just use in-memory data structures or file storage only.
+- For the sake of the problem, persistence is not required. Therefore don't use a database but just use in-memory data structures or file storage only. A lightweight abstraction over the storage is expected, so that we could potentially implement a different storage and see if the project still works. Make sure to always use promises with your storage, even if you only implement an in-memory one and don't really need promises.
 - Unless you have a strong preference otherwise, just use the boilerplate given in the repository.
 - You should optimize for both readability of your code and performance.
 - All values will be rounded to the nearest integer.
+
+#### Examples
+
+**Counters**
+
+```gql
+# Given that the project is running with a blank state.
+# Given that I run the following mutations:
+
+mutation incr {
+  incrementCounter(input: {key: "a", value: 1}) {
+    counter {
+      key
+      value
+    }
+  }
+}
+
+mutation incr {
+  incrementCounter(input: {key: "b", value: 1}) {
+    counter {
+      key
+      value
+    }
+  }
+}
+
+mutation incr {
+  incrementCounter(input: {key: "b", value: 2}) {
+    counter {
+      key
+      value
+    }
+  }
+}
+
+mutation incr {
+  incrementCounter(input: {key: "b", value: 3}) {
+    counter {
+      key
+      value
+    }
+  }
+}
+
+# When I make the following queries, then I should get the expected results:
+
+query allCounters {
+  counters {
+    key
+    value
+  }
+}
+# Expected result:
+# {
+#   "data": {
+#     "counters": [
+#       {
+#         "key": "b",
+#         "value": 6
+#       },
+#       {
+#         "key": "a",
+#         "value": 1
+#       }
+#     ]
+#   }
+# }
+
+query getCounter {
+  counter(key: "a") {
+    key
+    value
+  }
+}
+# Expected result:
+# {
+#   "data": {
+#     "counter": {
+#       "key": "a",
+#       "value": 1
+#     }
+#   }
+# }
+
+query getCounter {
+  counter(key: "b") {
+    key
+    value
+  }
+}
+# Expected result:
+# {
+#   "data": {
+#     "counter": {
+#       "key": "b",
+#       "value": 6
+#     }
+#   }
+# }
+
+query getCounter {
+  counter {
+    key
+    value
+  }
+}
+# Expected result:
+# {
+#   "data": {
+#     "counter": {
+#       "key": "b",
+#       "value": 6
+#     }
+#   }
+# }
+```
 
 #### GraphQL schema
 
@@ -108,7 +227,7 @@ type Counter {
 
 type Metric {
   key: String!
-  value: Int!
+  values: [Int!]!
   sum: Int!
 }
 
