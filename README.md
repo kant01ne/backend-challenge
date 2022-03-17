@@ -39,7 +39,7 @@ Louis, CTO @ Riot
 
 #### Problem
 
-Build a counters & metrisc logging and reporting service that sums metrics. You will build a lightweight web server that implements the API defined below.
+Build a counters & metrics logging and reporting service that sums metrics. You will build a lightweight web server that implements the API defined below.
 
 #### API
 
@@ -74,28 +74,30 @@ Return the metric for a given key. if no metric is found, return `null`.
 #### Clarifications
 
 - For the sake of the problem, persistence is not required. Therefore don't use a database but just use in-memory data structures or file storage only.
-- Unless you have a strong preference otherwise, just use a the boilerplate given in the repository.
+- Unless you have a strong preference otherwise, just use the boilerplate given in the repository.
 - You should optimize for both readability of your code and performance.
 - All values will be rounded to the nearest integer.
 
 #### GraphQL schema
 
+Your GraphQL API must have the following schema:
+
 ```gql
-input IncrementInput {
+input IncrementCounterInput {
   key: String!
   value: Int!
 }
 
-type IncrementPayload {
+type IncrementCounterPayload {
   counter: Counter!
 }
 
-input RecordInput {
+input RecordMetricInput {
   key: String!
   value: Int!
 }
 
-type RecordPayload {
+type RecordMetricPayload {
   metric: Metric!
 }
 
@@ -118,11 +120,11 @@ type Query {
 }
 
 type Mutation {
-  increment(input: IncrementInput!): IncrementPayload
-  record(input: RecordInput!): RecordPayload
+  incrementCounter(input: IncrementCounterInput!): IncrementCounterPayload
+  recordMetric(input: RecordMetricInput!): RecordMetricPayload
 }
 ```
 
-### Exercise 3 : 30 minutes technical interview and debriefing
+### Exercise 2 : 30 minutes technical interview and debriefing
 
 Once finished, send me your repository link by email: louis@tryriot.com & book a call [HERE](http://calendly.com/louis-cibot/30min)
