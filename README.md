@@ -32,8 +32,9 @@ Louis, CTO @ Riot
         - [Counters](#counters)
         - [Metrics](#metrics)
       - [Clarifications](#clarifications)
+      - [Examples](#examples)
       - [GraphQL schema](#graphql-schema)
-    - [Exercise 3 : 30 minutes technical interview and debriefing](#exercise-3--30-minutes-technical-interview-and-debriefing)
+    - [Exercise 2 : 30 minutes technical interview and debriefing](#exercise-2--30-minutes-technical-interview-and-debriefing)
 
 ### Exercise 1 : Counters & Metrics Service
 
@@ -79,6 +80,7 @@ Return the metric for a given key. if no metric is found, return `null`.
 - Unless you have a strong preference otherwise, just use the boilerplate given in the repository.
 - You should optimize for both readability of your code and performance.
 - All values will be rounded to the nearest integer.
+- You can get rid of any reported data after it is more than an hour old since we only need up to the most recent hour.
 
 #### Examples
 
