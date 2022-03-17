@@ -40,8 +40,10 @@ Louis, CTO @ Riot
 
 #### Problem
 
-Build a counter logging and reporting service which will allow you to increment various counters and retrieve their current values.
-Build a metrics logging and reporting service which will allow you to retrieve and sum the metrics' values by time window for the most recent hour.
+Build a counter logging and reporting service which will allow to increment various counters and retrieve their current values.
+
+Build a metrics logging and reporting service which will allow to retrieve and sum the metrics' values by time window for the most recent hour.
+
 You will build a lightweight web server that implements the API defined below.
 
 #### API
@@ -198,6 +200,81 @@ query getCounter {
 #   }
 # }
 ```
+
+**Metrics**
+
+```gql
+# Given that the project is running with a blank state.
+# Given that I ran the following mutations:
+
+# 2 hours ago
+mutation record {
+  recordMetric(input: {key: "a", value: 4}) {
+    metric {
+      key
+      values
+      sum
+    }
+  }
+}
+
+# 30 minutes ago
+mutation record {
+  recordMetric(input: {key: "a", value: 3}) {
+    metric {
+      key
+      values
+      sum
+    }
+  }
+}
+
+# 40 seconds ago
+mutation record {
+  recordMetric(input: {key: "a", value: 7}) {
+    metric {
+      key
+      values
+      sum
+    }
+  }
+}
+
+# 5 seconds ago
+mutation record {
+  recordMetric(input: {key: "a", value: 2}) {
+    metric {
+      key
+      values
+      sum
+    }
+  }
+}
+
+# When I make the following query, then I should get the expected results:
+
+query allMetrics {
+  metrics {
+    key
+    value
+    sum
+  }
+}
+# Expected result:
+# {
+#   "data": {
+#     "metrics": [
+#       {
+#         "key": "a",
+#         "values": [3, 7, 2],
+#         "sum": 12
+#       }
+#     ]
+#   }
+# }
+```
+
+** Note that the metric posted 2 hours ago is not included in the sum since we only care about data in the most recent hour for these APIs.
 
 #### GraphQL schema
 
