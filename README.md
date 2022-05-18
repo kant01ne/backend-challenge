@@ -256,7 +256,7 @@ mutation record {
 query allMetrics {
   metrics {
     key
-    value
+    values
     sum
   }
 }
