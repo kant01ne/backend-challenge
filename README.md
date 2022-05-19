@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="Riot logo" src="https://uploads-ssl.webflow.com/6278dd61c2d8953dae931fbd/6278dd61c2d8956b07932038_logo-purple%25201-p-500.png" />
+  <img alt="Riot logo" width="80" src="https://uploads-ssl.webflow.com/6278dd61c2d8953dae931fbd/6278dd61c2d8956b07932038_logo-purple%25201-p-500.png" />
   <br>
   <br>
 </p>
