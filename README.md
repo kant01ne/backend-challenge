@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="Riot logo" src="https://tryriot.com/wp-content/themes/riot-2020-production/images/logo-purple.svg" />
+  <img alt="Riot logo" src="https://uploads-ssl.webflow.com/6278dd61c2d8953dae931fbd/6278dd61c2d8956b07932038_logo-purple%25201-p-500.png" />
   <br>
   <br>
 </p>
