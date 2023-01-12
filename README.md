@@ -29,7 +29,6 @@ Louis, CTO @ Riot
     - [Exercise : MRR Compute Service](#exercise--mrr-compute-service)
       - [Problem](#problem)
       - [API](#api)
-        - [Metrics](#metrics)
       - [Clarifications](#clarifications)
       - [Example](#example)
 
