@@ -42,7 +42,7 @@ Louis, CTO @ Riot
 
 Your mission is:
 
-1. To be able to compute the total MRR by month for all subscriptions in dollars ($) from this weird/buggy API that change its response everytime someone request it 😈.
+1. To be able to compute the total MRR by month for all subscriptions in dollars ($) from this API. The API response changes its response everytime to emulate the time passing by ⏰.
 2. To be able to show the MRR difference from the past month for each subscription and every month.
 3. To write a small API to get those results.
 
