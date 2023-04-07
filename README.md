@@ -14,9 +14,10 @@ We're super happy to hear that! Getting right to it — the main purpose of this
 
 - Understand specs requirements.
 - Manipulate Data structure.
-- Create a small API in Node.js.
+- Create an API in Node.js & Typescript.
+- Basic use of Docker & Docker-compose.
 
-Feel free to open an issue if you got any questions or suggestions! Once it's ready, send us a repository link at louis@tryriot.com.
+Feel free to open an issue if you got any questions or suggestions! Once it's ready, send us a public repository link at louis@tryriot.com.
 
 Happy coding and cheers,
 
@@ -26,78 +27,163 @@ Louis, CTO @ Riot
 
 - [Riot Backend-challenge](#riot-backend-challenge)
   - [Table of Contents](#table-of-contents)
-    - [Exercise : MRR Compute Service](#exercise--mrr-compute-service)
+    - [Exercise : Unified API for employees directory](#exercise--mrr-compute-service)
       - [Problem](#problem)
       - [API](#api)
       - [Clarifications](#clarifications)
       - [Example](#example)
 
-### Exercise : MRR Compute Service
+### Exercise : Employee directory unified API
 
 #### Problem
 
-[MRR](<https://support.stripe.com/questions/understanding-monthly-recurring-revenue-(mrr)?>) (monthly recurring revenue) is **THE MOST IMPORTANT METRICS** for Software as a Service company (SaaS). As you may have guessed [Riot](https://tryriot.com) is a SaaS company working in Cybersecurity.
+When you sign in to Riot, one of the first things you will enable is the synchronisation of your employee directory. In Riot, you can synchronise your directory with Google, Slack, Microsoft, Okta. If you don't want to use a third-party service, you can create your employees manually or import them from a CSV. The advantage of a unified employee directory is that you can import the list of employees from these vendors and keep it up to date, avoiding duplicate values across vendors.
 
-🚨 Hint: Take some time to read carefully 👆 how to compute the MRR the right way!
+For the sake of this exercise, we are going to rebuild a small API to retrieve the employee directory for 2 providers Slack and Google.
 
-Your mission is:
+#### Todos
 
-1. To be able to compute in $ (usd) the total MRR by month for all subscriptions. The API response changes its response everytime to emulate the time passing by ⏰.
-2. To be able to show the MRR difference from the past month for each subscription and every month.
-3. To write a small API to get those results.
+1. Implement a POST `api/employees` that will take as input a name and an email address and will store the employee in the database.
 
 ```curl
-curl --request GET \
-  --url https://fake-subscriptions-api.fly.dev/api/subscriptions
+curl --location '/api/employees' \
+--header 'Content-Type: application/json' \
+--data '{
+    "name": "Louis Cibot"
+    "email": "louis@tryriot.com"
+}'
 ```
+
+- It should return a `400` if the email address is not in the correct format.
+- If the employee already exists, it should return a `409'.
+- It should return a `201` otherwise.
+
+2. Implement a POST `api/import` respecting the following specification
+
+```curl
+curl --location '/api/import' \
+--header 'Content-Type: application/json' \
+--data '{
+    "url": "https://fake-subscriptions-api.fly.dev/tests/slack/1"
+}'
+```
+
+- The url body parameter should respect the URL format and return `400` if the format is incorrect.
+
+Fetching this URL should return a list of employees from a specific provider.
+
+When the above endpoint is called, your program should fetch the given URL and synchronise the employees and store them in the database.
+
+Let's do a quick example to make sure you understand 🤓
+
+The response of the following Curl request is
+
+```curl
+curl --location '/api/import' \
+--header 'Content-Type: application/json' \
+--data '{
+    "url": "https://fake-directory-provider.onrender.com/tests/slack/0"
+}'
+```
+
+```json
+{
+  "provider": "Slack",
+  "employees": [
+    {
+      "id": "642ebbfe122f71aaa9186fd3",
+      "name": "Candace Foster",
+      "email": "candacefoster@quarx.com",
+    },
+    {
+      "id": "642ebbfe3ce36bfcee8df4d5",
+      "name": "Latonya Morrow",
+      "email": "latonyamorrow@quarx.com",
+    }
+  ]
+}
+```
+
+After this call, in your database you should find:
+  - Candace and Latonya in your employees table
+
+Easy no? 🤠
+
+Let's do a second call after this one.
+
+```curl
+curl --location '/api/import' \
+--header 'Content-Type: application/json' \
+--data '{
+    "url": "https://fake-directory-provider.onrender.com/tests/google/0"
+}'
+```
+
+```json
+{
+  "provider": "Google",
+  "employees": [
+    {
+      "id": "642ebbfe122f71aaa9186fd3",
+      "name": "Candace Foster",
+      "emails": [{"address": "candacefoster@quarx.com", "isPrimary": true }, {"address": "candace.foster@gmail.com", "isPrimary": false }],
+    },
+    {
+      "id": "642ebbfe3ce36bfcee8df4d5",
+      "name": "Aaron Medrano",
+      "emails": [{"address": "aaronmedrano@quarx.com", "isPrimary": true}],
+    }
+  ]
+}
+```
+
+After the 2 calls, in your database you should find:
+  - Candace from 2 providers
+  - Latonya from Slack
+  - Aaron from Google
+
+
+To sum up the rules:
+  1. Employees are matched by email address (if they have the same email address, primary or not).
+  2. An employee can be created manually using the `/api/employees` API.
+  3. If the manually created employee is not referenced in the `/import` call, it should not be deleted..
+  4. If the manually created employee is referenced during an import and then no longer referenced, they can be deleted..
+
+3. Implement a GET `api/employees` to retrieve all the employees stored in the database.
+
+```curl
+curl --location '/api/employees'
+```
+
+The answer should follow the format below:
+
+```
+[
+  {
+    "id": string,
+    "name": string,
+    "primaryEmailAddress": string,
+    "secondaryEmailAddresses": string[],
+    "googleUserId": string | null,
+    "slackUserId: string | null,
+  }
+]
+```
+
+#### Testing the exercise
+
+To test your exercise, you can use the following URL `https://fake-directory-provider.onrender.com/tests/:provider/:integer` for the imports
+  - `:provider` can be either google or slack
+  - `:integer` can iterate from 0 to 3. 
+
+You're free to create your own way of testing. Just follow the same structure..
 
 #### Clarifications
 
-- For the sake of the problem, persistence is not mandatory.
-- use at least Node.js + Typescript
+- For the sake of the problem, you need to use the appropriate database technology for this problem.
+- Use at least Node.js + Typescript
 - Unless you have a strong preference otherwise, just use a simple webserver like Express.
-- You should optimize for both readability of your code and performance.
+- You should optimise for both code readability and performance.
+- Validate and use the appropriate types when you can.
 - Tests are not mandatory but highly encouraged.
-- All values will be rounded to the nearest integer.
-- `items` represents the module subscribed for this subscriptions.
-- `quantity` represents the number of seats for this module.
-- `unit_amount` value are representing the price of the module in cents.
-- `status` represents the subscription status, `active` subscription should be included in the MRR compute.
-
-#### Example
-
-```json
-// For the following subscription the MRR is : 39.90$
-{
-    "id": "sub-1",
-    "status": "active",
-    "items" : [
-        {
-            "id": "sub-1-item-1",
-            "module": "awareness",
-            "unit_amount": 3990,
-            "quantity": 12
-        }],
-    "interval": "yearly",
-    "currency": "usd",
-    "percent_off": 0
-},
-```
-
-```json
-// For the following subscription the MRR is : 359.1$
-{
-    "id": "sub-1",
-    "status": "active",
-    "items" : [
-        {
-            "id": "sub-1-item-1",
-            "module": "awareness",
-            "unit_amount": 399,
-            "quantity": 100
-        }],
-    "interval": "monthly",
-    "currency": "usd",
-    "percent_off": 10
-},
-```
+- An explanation of your technical choice is highly encouraged.
