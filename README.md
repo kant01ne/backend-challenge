@@ -49,7 +49,7 @@ For the sake of this exercise, we are going to rebuild a small API to retrieve t
 curl --location '/api/employees' \
 --header 'Content-Type: application/json' \
 --data '{
-    "name": "Louis Cibot"
+    "name": "Louis Cibot",
     "email": "louis@tryriot.com"
 }'
 ```
